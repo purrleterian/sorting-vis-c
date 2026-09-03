@@ -1,16 +1,33 @@
 #include "bars.h"
 #include "main.h"
 #include <SDL3/SDL_render.h>
+#include "sort.h"
+
+void set_bar_height(Bars *b) {
+    float height;
+    for (int i = 0; i < b->total; i++) {
+        height = map(b->bar_n[i], 0, 1, 0, WINDOW_HEIGHT);
+
+
+        b->rects[i].w = b->bar_w;
+        b->rects[i].h = height;
+
+
+        b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
+        b->rects[i].x = (b->bar_w + BAR_GAP) * i;
+
+
+    }
+}
 
 void randomize_bars(Bars *b) {
+    sort_step = 0;
 
     float random_n;
     float height;
     for (int i = 0; i < b->total; i++) {
         random_n = ((rand() % 10001) / 10000.0);
-        height = random_n;
-
-        map(&height, 0, 1, 0, WINDOW_HEIGHT);
+        height = map(random_n, 0, 1, 0, WINDOW_HEIGHT);
 
         b->bar_n[i] = random_n;
         b->rects[i].h = height;
@@ -30,7 +47,6 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
         return false;
     }
 
-    float bar_gap = 3;
 
     Bars *b = *bars;
     b->renderer = renderer;
@@ -45,8 +61,7 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
     float height, n;
     for (int i = 0; i < b->total; i++) {
         n = 0.5;
-        height = n;
-        map(&height, 0, 1, 0, WINDOW_HEIGHT);
+        height = map(n, 0, 1, 0, WINDOW_HEIGHT);
 
         b->bar_n[i] = n;
 
@@ -54,7 +69,7 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
         b->rects[i].h = height;
 
         b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
-        b->rects[i].x = (b->bar_w + bar_gap) * i;
+        b->rects[i].x = (b->bar_w + BAR_GAP) * i;
 
         b->n_pos[i] = i;
     }

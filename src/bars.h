@@ -20,5 +20,9 @@ void bars_draw(Bars *b);
 void bars_update(Bars *b);
 
 void randomize_bars(Bars *b);
+void set_bar_height(Bars *b);
+
+#define BAR_GAP 1
+#define TOTAL_BARS 10
 
 #endif

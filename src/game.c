@@ -68,6 +68,11 @@ void game_events(struct Game *g) {
 
             case SDL_SCANCODE_R:
                 randomize_bars(g->bars);
+                break;
+
+            case SDL_SCANCODE_S:
+                selection_sort(g->bars, sort_step);
+                sort_step++;
 
             default:
                 break;

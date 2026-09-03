@@ -1,4 +1,4 @@
 
 
-extern void map(float *value, float istart, float istop, float ostart,
+extern float map(float value, float istart, float istop, float ostart,
                 float ostop);

@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "bars.h"
+#include "sort.h"
 
 struct Game {
     SDL_Window *window;
