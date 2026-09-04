@@ -23,6 +23,6 @@ void randomize_bars(Bars *b);
 void set_bar_height(Bars *b);
 
 #define BAR_GAP 1
-#define TOTAL_BARS 10
+#define TOTAL_BARS 200
 
 #endif

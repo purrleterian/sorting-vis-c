@@ -1,22 +1,18 @@
 #include "bars.h"
 #include "main.h"
-#include <SDL3/SDL_render.h>
 #include "sort.h"
+#include <SDL3/SDL_render.h>
 
 void set_bar_height(Bars *b) {
     float height;
     for (int i = 0; i < b->total; i++) {
         height = map(b->bar_n[i], 0, 1, 0, WINDOW_HEIGHT);
 
-
         b->rects[i].w = b->bar_w;
         b->rects[i].h = height;
 
-
         b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
         b->rects[i].x = (b->bar_w + BAR_GAP) * i;
-
-
     }
 }
 
@@ -47,11 +43,10 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
         return false;
     }
 
-
     Bars *b = *bars;
     b->renderer = renderer;
     b->total = TOTAL_BARS;
-    b->bar_w = (float)WINDOW_WIDTH / b->total;
+    b->bar_w = ((float)WINDOW_WIDTH / b->total) - BAR_GAP;
 
     b->rects =
         calloc(b->total, sizeof(SDL_FRect));    // store rect info for each bar
@@ -109,6 +104,12 @@ void bars_draw(Bars *b) {
     SDL_SetRenderDrawColor(b->renderer, 255, 255, 255, 255);
     for (int i = 0; i < b->total; i++) {
 
+        if (sort_step == b->n_pos[i]) {
+            SDL_SetRenderDrawColor(b->renderer, 0, 255, 0, 255);
+        } else {
+
+            SDL_SetRenderDrawColor(b->renderer, 255, 255, 255, 255);
+        }
         SDL_RenderFillRect(b->renderer, &b->rects[i]);
     }
 }

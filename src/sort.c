@@ -5,13 +5,12 @@ int sort_step = 0;
 void selection_sort(Bars *bars, int i) {
 
     printf("Sort step: %d\n", i);
-    if (sort_step < bars->total) {
+    if (i < bars->total && i >= 0) {
         int min_i = i;
         for (int j = i + 1; j < bars->total; j++) {
             if (bars->bar_n[j] < bars->bar_n[min_i]) {
                 min_i = j;
             }
-
         }
 
         float temp = bars->bar_n[min_i];
@@ -21,6 +20,28 @@ void selection_sort(Bars *bars, int i) {
 
         set_bar_height(bars);
     }
+
+    printf("[ ");
+    for (int i = 0; i < bars->total; i++) {
+        printf("%.4f ", bars->bar_n[i]);
+    }
+    printf("]\n");
+}
+
+void bubble_sort(Bars *bars, int i) {
+
+    if (i < bars->total) {
+        for (int j = 0; j < bars->total - 1; j++) {
+            float temp = bars->bar_n[j];
+            if (bars->bar_n[j] > bars->bar_n[j + 1]) {
+                bars->bar_n[j] = bars->bar_n[j + 1];
+                bars->bar_n[j + 1] = temp;
+            }
+
+            set_bar_height(bars);
+        }
+    }
+
 
     printf("[ ");
     for (int i = 0; i < bars->total; i++) {

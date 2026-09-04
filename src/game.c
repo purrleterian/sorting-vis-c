@@ -1,13 +1,11 @@
 #include "game.h"
 #include "init_sdl.h"
+#include "sort.h"
 #include <SDL3/SDL_render.h>
-
-
 
 void game_events(struct Game *g);
 void game_draw(struct Game *g);
 void game_update(struct Game *g);
-
 
 bool game_new(struct Game **game) {
     *game = calloc(1, sizeof(struct Game));
@@ -20,7 +18,8 @@ bool game_new(struct Game **game) {
         return false;
     }
 
-    if (!bars_new(&g->bars, g->renderer)) return false;
+    if (!bars_new(&g->bars, g->renderer))
+        return false;
 
     g->is_running = true;
 
@@ -73,6 +72,13 @@ void game_events(struct Game *g) {
             case SDL_SCANCODE_S:
                 selection_sort(g->bars, sort_step);
                 sort_step++;
+                break;
+
+
+            case SDL_SCANCODE_D:
+                bubble_sort(g->bars, sort_step);
+                sort_step++;
+                break;
 
             default:
                 break;
@@ -84,10 +90,7 @@ void game_events(struct Game *g) {
     }
 }
 
-void game_update(struct Game *g) {
-    bars_update(g->bars);
-}
-
+void game_update(struct Game *g) { bars_update(g->bars); }
 
 void game_draw(struct Game *g) {
     SDL_RenderClear(g->renderer);
@@ -110,4 +113,3 @@ void game_run(struct Game *g) {
         SDL_Delay(16);
     }
 }
-
