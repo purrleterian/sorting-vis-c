@@ -19,6 +19,8 @@ void selection_sort(Bars *bars, int i) {
         bars->bar_n[i] = temp;
 
         set_bar_height(bars);
+    } else {
+        sort_step = 0;
     }
 
     printf("[ ");
@@ -40,6 +42,8 @@ void bubble_sort(Bars *bars, int i) {
 
             set_bar_height(bars);
         }
+    } else {
+        sort_step = 0;
     }
 
 

@@ -21,8 +21,10 @@ void randomize_bars(Bars *b) {
 
     float random_n;
     float height;
+
+    float precision = 10000;
     for (int i = 0; i < b->total; i++) {
-        random_n = ((rand() % 10001) / 10000.0);
+        random_n = ((rand() % (int) precision + 1) / precision);
         height = map(random_n, 0, 1, 0, WINDOW_HEIGHT);
 
         b->bar_n[i] = random_n;

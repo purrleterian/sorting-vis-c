@@ -110,6 +110,6 @@ void game_run(struct Game *g) {
         game_update(g);
         game_draw(g);
 
-        SDL_Delay(16);
+        SDL_Delay(0);
     }
 }
