@@ -5,11 +5,12 @@
 #include "bars.h"
 #include "sort.h"
 
+extern SDL_AudioStream *stream;
+
 struct Game {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
-    SDL_AudioStream *audio_stream;
 
     Bars *bars;
     bool is_running;

@@ -1,13 +1,19 @@
 #include "game.h"
 #include "init_sdl.h"
 #include "sort.h"
+#include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_render.h>
 
 void game_events(struct Game *g);
 void game_draw(struct Game *g);
 void game_update(struct Game *g);
 
+
+SDL_AudioStream *stream = NULL;
+
+
 static void start_sort(struct Game *g, SDL_ThreadFunction fn) {
+
     if (SDL_GetAtomicInt(&g->bars->running))
         return; // one sort at a time
     SDL_SetAtomicInt(&g->bars->quit, 0);
@@ -60,9 +66,9 @@ void game_free(struct Game **game) {
             g->window = NULL;
         }
 
-        if (g->audio_stream) {
-            SDL_DestroyAudioStream(g->audio_stream);
-            g->audio_stream = NULL;
+        if (stream) {
+            SDL_DestroyAudioStream(stream);
+            stream = NULL;
         }
 
         if (g->bars) {
@@ -79,6 +85,7 @@ void game_free(struct Game **game) {
 }
 
 void game_events(struct Game *g) {
+
     while (SDL_PollEvent(&g->event)) {
         switch (g->event.type) {
         case SDL_EVENT_QUIT:
@@ -112,10 +119,12 @@ void game_events(struct Game *g) {
 
             case SDL_SCANCODE_UP:
                 g->bars->delay_ms = SDL_max(0, g->bars->delay_ms - 0.1f);
+
                 printf("%.3f\n", g->bars->delay_ms);
                 break;
             case SDL_SCANCODE_DOWN:
                 g->bars->delay_ms += 0.1;
+
                 printf("%.3f\n", g->bars->delay_ms);
                 break;
 

@@ -28,14 +28,14 @@ bool game_init_sdl(struct Game *g) {
     spec.freq = 8000;
  
 
-    g->audio_stream = SDL_OpenAudioDeviceStream(
+    stream = SDL_OpenAudioDeviceStream(
         SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
-    if (!g->audio_stream) {
+    if (!stream) {
         fprintf(stderr, "Error while creating audio stream: %s\n",
                 SDL_GetError());
         return false;
     }
 
-    SDL_ResumeAudioStreamDevice(g->audio_stream);
+    SDL_ResumeAudioStreamDevice(stream);
     return true;
 }

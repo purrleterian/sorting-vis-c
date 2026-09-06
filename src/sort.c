@@ -1,13 +1,51 @@
 #include "sort.h"
 #include "bars.h"
-#include <SDL3/SDL_atomic.h>
-#include <SDL3/SDL_mutex.h>
+#include "game.h"
 
-static void step(Bars *b, int i, int j) {
+int current_sine_sample = 0;
+
+int freq_for_value(float bar_n) {
+    // bar_n is 0..1 -> map to roughly 150Hz..1000Hz, weighted toward
+    // perceptually even steps rather than linear Hz
+    float min_f = 150.0f, max_f = 1000.0f;
+    return (int)(min_f * SDL_powf(max_f / min_f, bar_n));
+}
+
+void play_beep(int freq) {
+
+    // example from SDL3 website, this just feels the sample buffer with a sine
+    // wave.
+    static float samples[512]; /* this will feed 512 samples each frame until we
+                                  get to our maximum. */
+
+    // Don't pile more audio on top of a backlog — keep audio in sync with
+    // visuals
+    if (SDL_GetAudioStreamQueued(stream) > (int)sizeof(samples) * 2) {
+        return;
+    }
+
+    /* generate a 440Hz pure tone */
+    for (int i = 0; i < SDL_arraysize(samples); i++) {
+        const float phase = current_sine_sample * (freq) / 8000.0f;
+        samples[i] = SDL_sinf(phase * 2 * SDL_PI_F);
+        current_sine_sample++;
+    }
+
+    /* wrapping around to avoid floating-point errors */
+    current_sine_sample %= 8000;
+
+    SDL_PutAudioStreamData(stream, samples, sizeof(samples));
+}
+
+static void step(Bars *b, int _i, int _j) {
     SDL_LockMutex(b->lock);
-    b->hi1 = i;
-    b->hi2 = j;
+    b->hi1 = _i;
+    b->hi2 = _j;
+
     SDL_UnlockMutex(b->lock);
+
+
+    play_beep(freq_for_value(b->bar_n[_i]));
 
     while (SDL_GetAtomicInt(&b->paused) && !SDL_GetAtomicInt(&b->quit)) {
         SDL_Delay(10);
@@ -16,6 +54,17 @@ static void step(Bars *b, int i, int j) {
     if (!SDL_GetAtomicInt(&b->quit)) {
         SDL_DelayNS((Uint64)(b->delay_ms * 1000000.0f));
     }
+}
+
+void after_sort(Bars *b) {
+    float prev = b->delay_ms;
+    b->delay_ms = 5;
+    for (int i = 0; i < b->total; i++) {
+        step(b, i, i);
+    }
+
+
+    b->delay_ms = prev;
 }
 
 int selection_sort_thread(void *data) {
@@ -43,6 +92,10 @@ int selection_sort_thread(void *data) {
             step(b, i, min_i);
         }
     }
+    
+    after_sort(b);
+
+
     b->hi1 = b->hi2 = -1;
     SDL_SetAtomicInt(&b->running, 0);
     return 0;
@@ -70,6 +123,8 @@ int bubble_sort_thread(void *data) {
                 step(b, j, j + 1); // show the swap
         }
     }
+
+    after_sort(b);
 
     b->hi1 = b->hi2 = -1;
     SDL_SetAtomicInt(&b->running, 0);
