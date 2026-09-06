@@ -12,6 +12,14 @@ typedef struct {
     int *n_pos;
 
     int total;
+
+    int hi1, hi2;
+    SDL_Mutex *lock;
+    SDL_AtomicInt paused;
+    SDL_AtomicInt quit;
+    SDL_AtomicInt running;
+
+    float delay_ms;
 } Bars;
 
 bool bars_new(Bars **bars, SDL_Renderer *renderer);

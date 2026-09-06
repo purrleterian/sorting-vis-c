@@ -1,6 +1,6 @@
 #include "bars.h"
 #include "main.h"
-#include "sort.h"
+// #include "sort.h"
 #include <SDL3/SDL_render.h>
 
 void set_bar_height(Bars *b) {
@@ -17,11 +17,12 @@ void set_bar_height(Bars *b) {
 }
 
 void randomize_bars(Bars *b) {
-    sort_step = 0;
+    SDL_LockMutex(b->lock);
 
     float random_n;
     float height;
 
+    b->hi1 = b->hi2 = -1;
     float precision = 10000;
     for (int i = 0; i < b->total; i++) {
         random_n = ((rand() % (int) precision + 1) / precision);
@@ -32,9 +33,9 @@ void randomize_bars(Bars *b) {
 
         b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
 
-        printf("(%d): %.4f\n", b->n_pos[i], b->bar_n[i]);
     }
-    printf("\n");
+
+    SDL_UnlockMutex(b->lock);
 }
 
 bool bars_new(Bars **bars, SDL_Renderer *renderer) {
@@ -54,6 +55,12 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
         calloc(b->total, sizeof(SDL_FRect));    // store rect info for each bar
     b->bar_n = calloc(b->total, sizeof(float)); // store the n value of each bar
     b->n_pos = calloc(b->total, sizeof(int));
+
+    b->lock = SDL_CreateMutex();
+    b->hi1 = b->hi2 = -1;
+    b->delay_ms = 5.0f;
+
+
 
     float height, n;
     for (int i = 0; i < b->total; i++) {
@@ -88,6 +95,16 @@ void bars_free(Bars **bars) {
             b->rects = NULL;
         }
 
+        if (b->n_pos) {
+            free(b->n_pos);
+            b->n_pos = NULL;
+        }
+
+        if (b->lock) {
+            SDL_DestroyMutex(b->lock);
+            b->lock = NULL;
+        }
+
         b->renderer = NULL;
         free(b);
         *bars = NULL;
@@ -103,10 +120,11 @@ void bars_update(Bars *b) {
 
 void bars_draw(Bars *b) {
 
-    SDL_SetRenderDrawColor(b->renderer, 255, 255, 255, 255);
+    SDL_LockMutex(b->lock);
+
     for (int i = 0; i < b->total; i++) {
 
-        if (sort_step == b->n_pos[i]) {
+        if (b->hi1 == i || b->hi2 == i) {
             SDL_SetRenderDrawColor(b->renderer, 0, 255, 0, 255);
         } else {
 
@@ -114,4 +132,6 @@ void bars_draw(Bars *b) {
         }
         SDL_RenderFillRect(b->renderer, &b->rects[i]);
     }
+
+    SDL_UnlockMutex(b->lock);
 }

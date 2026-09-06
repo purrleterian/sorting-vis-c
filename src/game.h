@@ -9,9 +9,12 @@ struct Game {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;
+    SDL_AudioStream *audio_stream;
 
     Bars *bars;
     bool is_running;
+
+    SDL_Thread *sort_thread;
 };
 
 void game_free(struct Game **game);

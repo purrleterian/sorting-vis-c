@@ -3,6 +3,8 @@
 
 
 bool game_init_sdl(struct Game *g) {
+    SDL_AudioSpec spec;
+
     if (!SDL_Init(SDL_FLAGS)) {
         fprintf(stderr, "Error initializing SDL3: %s\n", SDL_GetError());
         return false;
