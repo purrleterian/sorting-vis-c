@@ -60,6 +60,11 @@ void game_free(struct Game **game) {
             g->window = NULL;
         }
 
+        if (g->audio_stream) {
+            SDL_DestroyAudioStream(g->audio_stream);
+            g->audio_stream = NULL;
+        }
+
         if (g->bars) {
             bars_free(&g->bars);
         }

@@ -1,6 +1,6 @@
 #include "init_sdl.h"
+#include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_render.h>
-
 
 bool game_init_sdl(struct Game *g) {
     SDL_AudioSpec spec;
@@ -22,7 +22,20 @@ bool game_init_sdl(struct Game *g) {
         return false;
     }
 
+
+    spec.channels = 1;
+    spec.format = SDL_AUDIO_F32;
+    spec.freq = 8000;
+ 
+
+    g->audio_stream = SDL_OpenAudioDeviceStream(
+        SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
+    if (!g->audio_stream) {
+        fprintf(stderr, "Error while creating audio stream: %s\n",
+                SDL_GetError());
+        return false;
+    }
+
+    SDL_ResumeAudioStreamDevice(g->audio_stream);
     return true;
 }
-
-
