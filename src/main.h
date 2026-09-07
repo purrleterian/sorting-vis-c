@@ -16,8 +16,8 @@
 #define SDL_FLAGS SDL_INIT_VIDEO | SDL_INIT_AUDIO
 
 #define WINDOW_TITLE "Sorting Visualizer"
-#define WINDOW_WIDTH 950 
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1280 
+#define WINDOW_HEIGHT 700
 
 
 

@@ -58,7 +58,7 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
 
     b->lock = SDL_CreateMutex();
     b->hi1 = b->hi2 = -1;
-    b->delay_ms = 5.0f;
+    b->delay_ms = 1.0f;
 
 
 

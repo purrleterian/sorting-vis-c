@@ -8,14 +8,13 @@ void game_events(struct Game *g);
 void game_draw(struct Game *g);
 void game_update(struct Game *g);
 
-
 SDL_AudioStream *stream = NULL;
-
 
 static void start_sort(struct Game *g, SDL_ThreadFunction fn) {
 
     if (SDL_GetAtomicInt(&g->bars->running))
         return; // one sort at a time
+
     SDL_SetAtomicInt(&g->bars->quit, 0);
     SDL_SetAtomicInt(&g->bars->paused, 0);
     SDL_SetAtomicInt(&g->bars->running, 1);

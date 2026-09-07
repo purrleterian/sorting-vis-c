@@ -47,6 +47,7 @@ static void step(Bars *b, int _i, int _j) {
 
     play_beep(freq_for_value(b->bar_n[_i]));
 
+    // while is paused, wait
     while (SDL_GetAtomicInt(&b->paused) && !SDL_GetAtomicInt(&b->quit)) {
         SDL_Delay(10);
     }
@@ -58,7 +59,7 @@ static void step(Bars *b, int _i, int _j) {
 
 void after_sort(Bars *b) {
     float prev = b->delay_ms;
-    b->delay_ms = 5;
+    b->delay_ms = 8;
     for (int i = 0; i < b->total; i++) {
         step(b, i, i);
     }
