@@ -2,16 +2,18 @@
 #include "bars.h"
 #include "game.h"
 
-int current_sine_sample = 0;
+static int current_sine_sample = 0;
+int comp = 0;
+int atr = 0;
 
-int freq_for_value(float bar_n) {
+static int freq_for_value(float bar_n) {
     // bar_n is 0..1 -> map to roughly 150Hz..1000Hz, weighted toward
     // perceptually even steps rather than linear Hz
     float min_f = 150.0f, max_f = 1000.0f;
     return (int)(min_f * SDL_powf(max_f / min_f, bar_n));
 }
 
-void play_beep(int freq) {
+static void play_beep(int freq) {
 
     // example from SDL3 website, this just feels the sample buffer with a sine
     // wave.
@@ -44,8 +46,8 @@ static void step(Bars *b, int _i, int _j) {
 
     SDL_UnlockMutex(b->lock);
 
-
     play_beep(freq_for_value(b->bar_n[_i]));
+    play_beep(freq_for_value(b->bar_n[_j]));
 
     // while is paused, wait
     while (SDL_GetAtomicInt(&b->paused) && !SDL_GetAtomicInt(&b->quit)) {
@@ -57,13 +59,12 @@ static void step(Bars *b, int _i, int _j) {
     }
 }
 
-void after_sort(Bars *b) {
+static void after_sort(Bars *b) {
     float prev = b->delay_ms;
-    b->delay_ms = 8;
+    b->delay_ms = 15;
     for (int i = 0; i < b->total; i++) {
         step(b, i, i);
     }
-
 
     b->delay_ms = prev;
 }
@@ -72,10 +73,14 @@ int selection_sort_thread(void *data) {
     Bars *b = (Bars *)data;
     int n = b->total;
 
+    atr = 0;
+    comp = 0;
+
     for (int i = 0; i < n - 1 && !SDL_GetAtomicInt(&b->quit); i++) {
         int min_i = i;
         for (int j = i + 1; j < n && !SDL_GetAtomicInt(&b->quit); j++) {
             step(b, j, min_i);
+            comp++;
             if (b->bar_n[j] < b->bar_n[min_i]) {
                 min_i = j;
             }
@@ -83,6 +88,8 @@ int selection_sort_thread(void *data) {
 
         if (!SDL_GetAtomicInt(&b->quit) && min_i != i) {
             SDL_LockMutex(b->lock);
+
+            atr += 3;
             float temp = b->bar_n[min_i];
 
             b->bar_n[min_i] = b->bar_n[i];
@@ -93,9 +100,8 @@ int selection_sort_thread(void *data) {
             step(b, i, min_i);
         }
     }
-    
-    after_sort(b);
 
+    after_sort(b);
 
     b->hi1 = b->hi2 = -1;
     SDL_SetAtomicInt(&b->running, 0);
@@ -106,13 +112,18 @@ int bubble_sort_thread(void *data) {
     Bars *b = (Bars *)data;
     int n = b->total;
 
+    comp = 0;
+    atr = 0;
+
     for (int i = 0; i < n - 1 && !SDL_GetAtomicInt(&b->quit); i++) {
         for (int j = 0; j < n - 1 && !SDL_GetAtomicInt(&b->quit); j++) {
             step(b, j, j + 1);
 
             SDL_LockMutex(b->lock);
             bool needs_swap = b->bar_n[j] > b->bar_n[j + 1];
+            comp++;
             if (needs_swap) {
+                atr += 3;
                 float tmp = b->bar_n[j];
                 b->bar_n[j] = b->bar_n[j + 1];
                 b->bar_n[j + 1] = tmp;

@@ -28,9 +28,13 @@ void bars_draw(Bars *b);
 void bars_update(Bars *b);
 
 void randomize_bars(Bars *b);
+void shuffle_bars(Bars *b);
 void set_bar_height(Bars *b);
+void update_bars_pos(Bars *b);
+void change_bar_n(Bars *b, int n);
 
-#define BAR_GAP 2
-#define TOTAL_BARS 100
+#define BAR_GAP 1
+
+extern int total_bars;
 
 #endif

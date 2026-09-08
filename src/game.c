@@ -102,6 +102,11 @@ void game_events(struct Game *g) {
                 randomize_bars(g->bars);
                 break;
 
+            case SDL_SCANCODE_E:
+                stop_sort(g);
+                shuffle_bars(g->bars);
+                break;
+
             case SDL_SCANCODE_S:
                 start_sort(g, selection_sort_thread);
                 break;
@@ -119,12 +124,27 @@ void game_events(struct Game *g) {
             case SDL_SCANCODE_UP:
                 g->bars->delay_ms = SDL_max(0, g->bars->delay_ms - 0.1f);
 
-                printf("%.3f\n", g->bars->delay_ms);
+                printf("Delay: %.3f\n", g->bars->delay_ms);
                 break;
+
             case SDL_SCANCODE_DOWN:
                 g->bars->delay_ms += 0.1;
 
-                printf("%.3f\n", g->bars->delay_ms);
+                printf("Delay: %.3f\n", g->bars->delay_ms);
+                break;
+
+            case SDL_SCANCODE_LEFT:
+                stop_sort(g);
+                change_bar_n(g->bars, -1);
+
+                printf("Bars Total; %d\n", g->bars->total);
+                break;
+
+            case SDL_SCANCODE_RIGHT:
+                stop_sort(g);
+
+                change_bar_n(g->bars, 1);
+                printf("Bars Total; %d\n", g->bars->total);
                 break;
 
             default:
@@ -144,6 +164,15 @@ void game_draw(struct Game *g) {
 
     // draw here
     bars_draw(g->bars);
+
+    SDL_SetRenderScale(g->renderer, 1.5f, 1.5f);
+    SDL_SetRenderDrawColor(g->renderer, 255, 255, 255, 255);
+    SDL_RenderDebugTextFormat(
+        g->renderer, 10, 10,
+        "Barras: %d / Delay: %.3f / Comparacoes: %d / Atribuicoes: %d",
+        g->bars->total, g->bars->delay_ms, comp, atr);
+    SDL_SetRenderScale(g->renderer, 1.0f, 1.0f);
+
     SDL_RenderPresent(g->renderer);
 
     SDL_SetRenderDrawColor(g->renderer, 34, 35, 35, 255);
