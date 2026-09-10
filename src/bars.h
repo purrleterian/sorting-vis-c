@@ -20,6 +20,8 @@ typedef struct {
     SDL_AtomicInt running;
 
     float delay_ms;
+
+    float gap;
 } Bars;
 
 bool bars_new(Bars **bars, SDL_Renderer *renderer);
@@ -33,7 +35,6 @@ void set_bar_height(Bars *b);
 void update_bars_pos(Bars *b);
 void change_bar_n(Bars *b, int n);
 
-#define BAR_GAP 1
 
 extern int total_bars;
 

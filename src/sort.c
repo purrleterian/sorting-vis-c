@@ -3,8 +3,10 @@
 #include "game.h"
 
 static int current_sine_sample = 0;
-int comp = 0;
-int atr = 0;
+long comp = 0;
+long  atr = 0;
+
+char *sort_name = "(none)";
 
 static int freq_for_value(float bar_n) {
     // bar_n is 0..1 -> map to roughly 150Hz..1000Hz, weighted toward
@@ -70,6 +72,7 @@ static void after_sort(Bars *b) {
 }
 
 int selection_sort_thread(void *data) {
+    sort_name = "Selection Sort";
     Bars *b = (Bars *)data;
     int n = b->total;
 
@@ -109,6 +112,7 @@ int selection_sort_thread(void *data) {
 }
 
 int bubble_sort_thread(void *data) {
+    sort_name = "Bubble Sort";
     Bars *b = (Bars *)data;
     int n = b->total;
 
@@ -116,7 +120,7 @@ int bubble_sort_thread(void *data) {
     atr = 0;
 
     for (int i = 0; i < n - 1 && !SDL_GetAtomicInt(&b->quit); i++) {
-        for (int j = 0; j < n - 1 && !SDL_GetAtomicInt(&b->quit); j++) {
+        for (int j = 0; j < n - i - 1 && !SDL_GetAtomicInt(&b->quit); j++) {
             step(b, j, j + 1);
 
             SDL_LockMutex(b->lock);
@@ -138,6 +142,53 @@ int bubble_sort_thread(void *data) {
 
     after_sort(b);
 
+    b->hi1 = b->hi2 = -1;
+    SDL_SetAtomicInt(&b->running, 0);
+    return 0;
+}
+
+int insertion_sort_thread(void *data) {
+    Bars *b = (Bars *)data;
+
+    int n = b->total;
+
+    sort_name = "Insertion Sort";
+    comp = 0;
+    atr = 0;
+
+    for (int i = 1; i < n && !SDL_GetAtomicInt(&b->quit); ++i) {
+        SDL_LockMutex(b->lock);
+        float key = b->bar_n[i];
+        SDL_UnlockMutex(b->lock);
+        // start one position before the key
+        int j = i - 1;
+
+        while (j >= 0 && b->bar_n[j] > key && !SDL_GetAtomicInt(&b->quit)) {
+            comp++;
+            atr += 1;
+
+            step(b, j, j+1);
+
+            SDL_LockMutex(b->lock);
+            b->bar_n[j+1] = b->bar_n[j];
+            set_bar_height(b);
+            SDL_UnlockMutex(b->lock);
+            
+            j--;
+        }
+
+
+        SDL_LockMutex(b->lock);
+        b->bar_n[j+1] = key;
+        set_bar_height(b);
+        
+        step(b, j+1, i);
+        SDL_UnlockMutex(b->lock);
+        
+    }
+
+   
+    after_sort(b);
     b->hi1 = b->hi2 = -1;
     SDL_SetAtomicInt(&b->running, 0);
     return 0;

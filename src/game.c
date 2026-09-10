@@ -48,6 +48,13 @@ bool game_new(struct Game **game) {
 
     g->is_running = true;
 
+    printf("Press (E) to shuffle bars\n");
+    printf("Press (R) to randomize values\n");
+    printf("Press (S) to start Selection Sort\n");
+    printf("Press (E) to start Bubble Sort\n");
+    printf("Press (Space) to pause/resume\n");
+    printf("Press (G) to toggle gap between bars\n");
+
     return true;
 }
 
@@ -107,6 +114,10 @@ void game_events(struct Game *g) {
                 shuffle_bars(g->bars);
                 break;
 
+            case SDL_SCANCODE_A:
+                start_sort(g, insertion_sort_thread);
+                break;
+
             case SDL_SCANCODE_S:
                 start_sort(g, selection_sort_thread);
                 break;
@@ -124,27 +135,33 @@ void game_events(struct Game *g) {
             case SDL_SCANCODE_UP:
                 g->bars->delay_ms = SDL_max(0, g->bars->delay_ms - 0.1f);
 
-                printf("Delay: %.3f\n", g->bars->delay_ms);
                 break;
 
             case SDL_SCANCODE_DOWN:
                 g->bars->delay_ms += 0.1;
 
-                printf("Delay: %.3f\n", g->bars->delay_ms);
                 break;
 
             case SDL_SCANCODE_LEFT:
                 stop_sort(g);
                 change_bar_n(g->bars, -1);
 
-                printf("Bars Total; %d\n", g->bars->total);
                 break;
 
             case SDL_SCANCODE_RIGHT:
                 stop_sort(g);
 
                 change_bar_n(g->bars, 1);
-                printf("Bars Total; %d\n", g->bars->total);
+                break;
+
+            case SDL_SCANCODE_G:
+                stop_sort(g);
+                g->bars->gap = 1 ? g->bars->gap == 0 : 0;
+
+                // redraw the bars
+                update_bars_pos(g->bars);
+                bars_draw(g->bars);
+                game_draw(g);
                 break;
 
             default:
@@ -169,8 +186,9 @@ void game_draw(struct Game *g) {
     SDL_SetRenderDrawColor(g->renderer, 255, 255, 255, 255);
     SDL_RenderDebugTextFormat(
         g->renderer, 10, 10,
-        "Barras: %d / Delay: %.3f / Comparacoes: %d / Atribuicoes: %d",
+        "Barras: %d / Delay: %.3f / Comparacoes: %lu / Atribuicoes: %lu",
         g->bars->total, g->bars->delay_ms, comp, atr);
+    SDL_RenderDebugTextFormat(g->renderer, 10, 25, "Alg: %s", sort_name);
     SDL_SetRenderScale(g->renderer, 1.0f, 1.0f);
 
     SDL_RenderPresent(g->renderer);

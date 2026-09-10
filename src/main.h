@@ -17,8 +17,8 @@
 
 #define WINDOW_TITLE "Sorting Visualizer"
 
-#define WINDOW_WIDTH 900 
-#define WINDOW_HEIGHT 500
+#define WINDOW_WIDTH 1280 
+#define WINDOW_HEIGHT 700
 #define MARGIN_TOP 50
 
 

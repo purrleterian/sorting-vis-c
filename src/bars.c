@@ -3,7 +3,7 @@
 // #include "sort.h"
 #include <SDL3/SDL_render.h>
 
-int total_bars = 100;
+int total_bars = 50;
 
 void set_bar_height(Bars *b) {
     float height;
@@ -14,7 +14,7 @@ void set_bar_height(Bars *b) {
         b->rects[i].h = height;
 
         b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
-        b->rects[i].x = (b->bar_w + BAR_GAP) * i;
+        b->rects[i].x = (b->bar_w + b->gap) * i;
     }
 }
 
@@ -65,13 +65,13 @@ void shuffle_bars(Bars *b) {
 
 void update_bars_pos(Bars *bars) {
     for (int i = 0; i < bars->total; i++) {
-        bars->bar_w = ((float)WINDOW_WIDTH / bars->total) - BAR_GAP;
+        bars->bar_w = ((float)WINDOW_WIDTH / bars->total) - bars->gap;
         bars->rects[i].w = bars->bar_w;
 
         bars->rects[i].w = bars->bar_w;
 
         bars->rects[i].y = WINDOW_HEIGHT - bars->rects[i].h;
-        bars->rects[i].x = (bars->bar_w + BAR_GAP) * i;
+        bars->rects[i].x = (bars->bar_w + bars->gap) * i;
 
 
     }
@@ -103,7 +103,9 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
     Bars *b = *bars;
     b->renderer = renderer;
     b->total = total_bars;
-    b->bar_w = ((float)WINDOW_WIDTH / b->total) - BAR_GAP;
+
+    b->gap = 1;
+    b->bar_w = ((float)WINDOW_WIDTH / b->total) - b->gap;
 
     b->rects =
         calloc(b->total, sizeof(SDL_FRect));    // store rect info for each bar
@@ -113,6 +115,7 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
     b->lock = SDL_CreateMutex();
     b->hi1 = b->hi2 = -1;
     b->delay_ms = 1.0f;
+
 
     float height, n;
     for (int i = 0; i < b->total; i++) {
@@ -125,7 +128,7 @@ bool bars_new(Bars **bars, SDL_Renderer *renderer) {
         b->rects[i].h = height;
 
         b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
-        b->rects[i].x = (b->bar_w + BAR_GAP) * i;
+        b->rects[i].x = (b->bar_w + b->gap) * i;
 
         b->n_pos[i] = i;
     }
