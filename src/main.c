@@ -2,6 +2,10 @@
 
 
 int main(int argc, char **argv) {
+    if (argc > 1) {
+        total_bars = atoi(argv[1]);
+    }
+
     srand(time(NULL));
     int exit_status = EXIT_FAILURE;
     srand(time(NULL));
