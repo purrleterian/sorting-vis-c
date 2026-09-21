@@ -4,7 +4,7 @@
 
 static int current_sine_sample = 0;
 long comp = 0;
-long  atr = 0;
+long atr = 0;
 
 char *sort_name = "(none)";
 
@@ -167,27 +167,24 @@ int insertion_sort_thread(void *data) {
             comp++;
             atr += 1;
 
-            step(b, j, j+1);
+            step(b, j, j + 1);
 
             SDL_LockMutex(b->lock);
-            b->bar_n[j+1] = b->bar_n[j];
+            b->bar_n[j + 1] = b->bar_n[j];
             set_bar_height(b);
             SDL_UnlockMutex(b->lock);
-            
+
             j--;
         }
 
-
         SDL_LockMutex(b->lock);
-        b->bar_n[j+1] = key;
+        b->bar_n[j + 1] = key;
         set_bar_height(b);
-        
-        step(b, j+1, i);
+
+        step(b, j + 1, i);
         SDL_UnlockMutex(b->lock);
-        
     }
 
-   
     after_sort(b);
     b->hi1 = b->hi2 = -1;
     SDL_SetAtomicInt(&b->running, 0);

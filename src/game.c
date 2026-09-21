@@ -50,8 +50,10 @@ bool game_new(struct Game **game) {
 
     printf("Press (E) to shuffle bars\n");
     printf("Press (R) to randomize values\n");
+    printf("Press (A) to start Insertion Sort\n");
     printf("Press (S) to start Selection Sort\n");
-    printf("Press (E) to start Bubble Sort\n");
+    printf("Press (D) to start Bubble Sort\n");
+    printf("Press (D) to start Quick Sort\n");
     printf("Press (Space) to pause/resume\n");
     printf("Press (G) to toggle gap between bars\n");
 

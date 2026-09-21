@@ -171,6 +171,7 @@ void bars_update(Bars *b) {
 
     for (int i = 0; i < b->total; i++) {
         // update
+        b->rects[i].y = WINDOW_HEIGHT - b->rects[i].h;
     }
 }
 
