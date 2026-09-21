@@ -1,6 +1,8 @@
 #include "sort.h"
 #include "bars.h"
 #include "game.h"
+#include <SDL3/SDL_atomic.h>
+#include <SDL3/SDL_mutex.h>
 
 static int current_sine_sample = 0;
 long comp = 0;
@@ -184,6 +186,58 @@ int insertion_sort_thread(void *data) {
         step(b, j + 1, i);
         SDL_UnlockMutex(b->lock);
     }
+
+    after_sort(b);
+    b->hi1 = b->hi2 = -1;
+    SDL_SetAtomicInt(&b->running, 0);
+    return 0;
+}
+
+static void swap(float *x, float *y) {
+    float temp = *x;
+    *x = *y;
+    *y = temp;
+}
+
+static int partition(Bars *b, int low, int high) {
+    SDL_LockMutex(b->lock);
+    float pivot_value = b->bar_n[high];
+    SDL_UnlockMutex(b->lock);
+    int i = low;
+    for (int j = low; j < high && !SDL_GetAtomicInt(&b->quit); j++) {
+
+        step(b, i, j);
+        if (b->bar_n[j] <= pivot_value) {
+            SDL_LockMutex(b->lock);
+            swap(&b->bar_n[j], &b->bar_n[i]);
+            SDL_UnlockMutex(b->lock);
+            i++;
+        }
+    }
+
+    SDL_LockMutex(b->lock);
+    swap(&b->bar_n[i], &b->bar_n[high]);
+    set_bar_height(b);
+    SDL_UnlockMutex(b->lock);
+    step(b, i, high);
+
+    return i;
+}
+
+static void quick_sort_recurs(Bars *b, int low, int high) {
+    if (low < high) {
+        int pivot = partition(b, low, high);
+        quick_sort_recurs(b, low, pivot - 1);
+        quick_sort_recurs(b, pivot + 1, high);
+    }
+}
+
+int quick_sort_thread(void *data) {
+    Bars *b = (Bars *)data;
+    int n = b->total;
+
+    quick_sort_recurs(b, 0, n - 1);
+    set_bar_height(b);
 
     after_sort(b);
     b->hi1 = b->hi2 = -1;

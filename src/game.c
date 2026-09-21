@@ -128,6 +128,11 @@ void game_events(struct Game *g) {
                 start_sort(g, bubble_sort_thread);
                 break;
 
+
+            case SDL_SCANCODE_F:
+                start_sort(g, quick_sort_thread);
+                break;
+
             case SDL_SCANCODE_SPACE: {
                 int cur = SDL_GetAtomicInt(&g->bars->paused);
                 SDL_SetAtomicInt(&g->bars->paused, !cur);
