@@ -3,7 +3,7 @@
 // #include "sort.h"
 #include <SDL3/SDL_render.h>
 
-int total_bars = 50;
+int total_bars = 100;
 
 void set_bar_height(Bars *b) {
     float height;
