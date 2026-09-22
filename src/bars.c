@@ -45,8 +45,9 @@ void shuffle_bars(Bars *b) {
     b->hi1 = b->hi2 = -1;
 
     // assign ints;
+    
     for (int i = 0; i < b->total; i++) {
-        b->bar_n[i] = map(i, 0, b->total, 0, 1);
+        b->bar_n[i] = map(i, 0, b->total, 0.01, 1);
     }
 
     // shuffle;
