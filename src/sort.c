@@ -207,9 +207,11 @@ static int partition(Bars *b, int low, int high) {
     for (int j = low; j < high && !SDL_GetAtomicInt(&b->quit); j++) {
 
         step(b, i, j);
+        comp++;
         if (b->bar_n[j] <= pivot_value) {
             SDL_LockMutex(b->lock);
             swap(&b->bar_n[j], &b->bar_n[i]);
+            atr+= 3;
             SDL_UnlockMutex(b->lock);
             i++;
         }
@@ -217,6 +219,7 @@ static int partition(Bars *b, int low, int high) {
 
     SDL_LockMutex(b->lock);
     swap(&b->bar_n[i], &b->bar_n[high]);
+    atr+=3;
     set_bar_height(b);
     SDL_UnlockMutex(b->lock);
     step(b, i, high);
