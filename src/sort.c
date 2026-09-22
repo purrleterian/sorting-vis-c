@@ -236,6 +236,13 @@ int quick_sort_thread(void *data) {
     Bars *b = (Bars *)data;
     int n = b->total;
 
+    
+    sort_name = "Quick Sort";
+    comp = 0;
+    atr = 0;
+
+
+
     quick_sort_recurs(b, 0, n - 1);
     set_bar_height(b);
 
